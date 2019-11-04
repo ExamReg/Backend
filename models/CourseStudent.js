@@ -2,7 +2,8 @@ module.exports = (sequelize, Sequelize) => {
 
     const CourseStudent = sequelize.define("CourseStudent", {
         is_eligible: {
-            type: Sequelize.BOOLEAN
+            type: Sequelize.BOOLEAN,
+            defaultValue: true
         }
     });
 
