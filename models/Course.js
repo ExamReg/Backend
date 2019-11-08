@@ -7,6 +7,10 @@ module.exports = (sequelize, Sequelize) => {
         },
         course_name: {
             type: Sequelize.STRING
+        },
+        is_done: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
         }
     });
 
