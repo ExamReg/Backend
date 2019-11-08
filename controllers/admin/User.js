@@ -13,6 +13,9 @@ async function registerAccountAdmin(req, res) {
         if(code !== config.get("key_register_admin")){
             throw new Error("Code không đúng.")
         }
+        if(password.length < 8){
+            throw new Error("Mật khẩu phải có ít nhất 8 kí tự.")
+        }
         let user = await db.User.findOne({
             where: {
                 [db.Sequelize.Op.or]: [
@@ -29,7 +32,7 @@ async function registerAccountAdmin(req, res) {
             throw new Error("Tài khoản hoặc email đã tồn tại.")
         }
         let salt = await bcrypt.genSalt(config.get("saltRound"));
-        let newPassword = await bcrypt.hash(password, salt);
+        let newPassword = await bcrypt.hash(password.toString(), salt);
         await db.User.create({
             user_name: user_name,
             name: name,
@@ -57,7 +60,7 @@ async function loginWithAccountAdmin(req, res){
         if(!user){
             throw new Error("Tài khoản không tồn tại.")
         }
-        let check = await bcrypt.compare(password, user.dataValues.password);
+        let check = await bcrypt.compare(password.toString(), user.dataValues.password);
         if(!check){
             throw new Error("Mật khẩu không chính xác.")
         }
