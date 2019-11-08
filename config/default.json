@@ -6,5 +6,9 @@
 		"user": "",
 		"password": "",
 		"name": ""
-	}
+	},
+	"key_register_admin": "",
+	"saltRound": "",
+	"secret_key": "",
+	"time_expired": ""
 }

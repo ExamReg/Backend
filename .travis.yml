@@ -3,17 +3,17 @@ node_js:
   - 10.16.3
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in quanht.pem.enc -out quanht.pem -d
-  - chmod 700 quanht.pem
+  - openssl aes-256-cbc -K $encrypted_05a44ac5d57d_key -iv $encrypted_05a44ac5d57d_iv -in exam_reg.pem.enc -out exam_reg.pem -d
+  - chmod 700 exam_reg.pem
 
 deploy:
   - provider: script
     skip_cleanup: true
     script:
-      - ssh -i quanht.pem -o StrictHostKeyChecking=no ubuntu@ec2-18-162-115-131.ap-east-1.compute.amazonaws.com 'bash -s' < deploy.sh $nodeHome
+      - ssh -i exam_reg.pem -o StrictHostKeyChecking=no ubuntu@18.162.115.187 'bash -s' < deploy.sh $nodeHome
     on:
-      branch: dev
+      branch: master
 branches:
   only:
-    - dev
+    - master
 

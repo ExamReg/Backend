@@ -1,7 +1,7 @@
 #!/bin/bash
 
-cd ~/BTL/Backend
+cd ~/ExamReg/backend
 git pull
 export PATH=$PATH:$1
 $1/npm install
-$1/pm2 restart backend
+$1/pm2 restart exam_reg_backend

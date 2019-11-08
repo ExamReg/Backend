@@ -1,0 +1,14 @@
+{
+  "port": 3001,
+  "database": {
+    "host": "localhost",
+    "port": 3306,
+    "user": "root",
+    "password": "23041999",
+    "name": "ExamReg"
+  },
+  "key_register_admin": "ThisIsKeyTest",
+  "saltRound": 10,
+  "secret_key": "jkasqwemasaskqjweoakqwejhqsdflkqwoasdfjkl",
+  "time_expired": "1h"
+}
