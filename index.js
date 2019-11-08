@@ -4,9 +4,6 @@ const db = require("./models/index");
 const BodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
-const dotenv = require("dotenv");
-
-dotenv.config();
 
 const port = config.get("port") || 3000;
 
@@ -20,6 +17,8 @@ app.use("/ping", (req, res) => {
     res.send("pong")
 });
 
+app.use("/api", require("./router/index"));
+
 db.sequelize.sync({
     force: false
 })
@@ -32,5 +31,6 @@ db.sequelize.sync({
     })
     .catch(err => {
         console.log("Can't connect db: ", err.message);
+
         process.exit(err)
     });
