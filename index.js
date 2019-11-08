@@ -1,12 +1,24 @@
 const express = require("express");
 const config = require("config");
 const db = require("./models/index");
+const BodyParser = require("body-parser");
+const morgan = require("morgan");
+const cors = require("cors");
+const dotenv = require("dotenv");
 
+dotenv.config();
 
 const port = config.get("port") || 3000;
 
-
 const app = express();
+app.use(cors());
+app.use(morgan('tiny'));
+app.use(BodyParser.json());
+app.use(BodyParser.urlencoded({extended: false}));
+
+app.use("/ping", (req, res) => {
+    res.send("pong")
+});
 
 db.sequelize.sync({
     force: false

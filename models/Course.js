@@ -23,6 +23,10 @@ module.exports = (sequelize, Sequelize) => {
         Course.hasMany(models.Exam, {
             foreignKey: "id_course",
             sourceKey: "id_course"
+        });
+        Course.belongsTo(models.Semester, {
+            foreignKey: "id_semester",
+            targetKey: "id_semester"
         })
     };
 
