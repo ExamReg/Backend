@@ -24,7 +24,6 @@ async function importStudentFromExcelFile(req, res){
                         name: e.name,
                         password: password
                     });
-                    console.log("create success")
                 }
             }
         }

@@ -5,7 +5,7 @@ const xlsToJson = require("xls-to-json");
 function convertExcelToJson(file_import) {
     return new Promise((resolve, reject) => {
         let excelToJson;
-        if(file_import.originalname.split(".")[file_import.originalname.split(".") - 1] === "xlsx"){
+        if(file_import.originalname.split(".")[file_import.originalname.split(".").length - 1] === "xlsx"){
             excelToJson = xlsxToJson;
         }else{
             excelToJson = xlsToJson
