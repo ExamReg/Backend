@@ -23,7 +23,7 @@ db.sequelize.sync({
     force: false
 })
     .then(() => {
-        console.log("Connect db oki....");
+        console.log("Connect db oki...");
         app.listen(port, () => {
             console.log("Server running on:", port);
         });
