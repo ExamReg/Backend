@@ -8,13 +8,13 @@ module.exports.buildSuccess = (data) => {
     }
 };
 
-module.exports.buildFail = (err) => {
-    if(!err){
+module.exports.buildFail = (msg) => {
+    if(!msg){
         throw new Error("Data missing");
     }
     return {
         success: false,
-        message: err
+        message: msg
     }
 };
 

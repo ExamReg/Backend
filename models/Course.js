@@ -11,7 +11,17 @@ module.exports = (sequelize, Sequelize) => {
         is_done: {
             type: Sequelize.BOOLEAN,
             defaultValue: false
+        },
+        create_time: {
+            type: Sequelize.STRING
         }
+    },{
+        indexes: [
+            {
+                type: "FULLTEXT",
+                fields: ['course_name']
+            }
+        ]
     });
 
     Course.associate = (models) => {

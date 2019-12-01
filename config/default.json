@@ -9,6 +9,7 @@
 	},
 	"key_register_admin": "",
 	"saltRound": "",
-	"secret_key": "",
-	"time_expired": ""
+	"secret_key_admin": "",
+	"time_expired": "",
+	"secret_key_student": ""
 }

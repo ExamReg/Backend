@@ -10,6 +10,7 @@ api.post("/register", userController.registerAccountAdmin);
 api.post("/login", userController.loginWithAccountAdmin);
 
 api.post("/courses", upload, courseController.createNewCourse);
+api.get("/courses", courseController.getCourses);
 
 
 
