@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ~/ExamReg/backend
+cd ~/workspace/ExamReg/backend
 git pull
 export PATH=$PATH:$1
 $1/npm install
