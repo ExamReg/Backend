@@ -4,7 +4,7 @@ node_js:
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_05a44ac5d57d_key -iv $encrypted_05a44ac5d57d_iv -in quanht.pem.enc -out quanht.pem -d
-  - chmod 700 exam_reg.pem
+  - chmod 700 quanht.pem
 
 deploy:
   - provider: script
