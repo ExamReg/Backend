@@ -28,7 +28,7 @@ async function importStudentFromExcelFile(req, res){
             }
         }
         catch(err){
-            console.log("transaction err: ", err.message)
+            console.log("insert Student err: ", err.message)
         }
         res.json(response.buildSuccess({}));
     }
