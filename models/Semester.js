@@ -12,10 +12,10 @@ module.exports = (sequelize, Sequelize) => {
     });
 
     Semester.associate = (models) => {
-        Semester.hasMany(models.Course, {
+        Semester.belongsToMany(models.Course, {
             foreignKey: "id_semester",
-            sourceKey: "id_semester"
-        })
+            through: models.CourseSemester
+        });
     };
 
     return Semester;

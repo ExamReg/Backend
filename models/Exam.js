@@ -6,7 +6,7 @@ module.exports = (sequelize, Sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
-        test_day: {
+        name: {
             type: Sequelize.STRING
         }
     });
@@ -16,10 +16,11 @@ module.exports = (sequelize, Sequelize) => {
             foreignKey: "id_exam",
             sourceKey: "id_exam"
         });
-        Exam.belongsTo(models.Course, {
-           foreignKey: "id_course",
-           targetKey: "id_course"
-        })
+        // Exam.belongsTo(models.CourseSemester, {
+        //     foreignKey: "id_cs",
+        //     targetKey: "id_cs"
+        // });
+
     };
 
     return Exam;

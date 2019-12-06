@@ -4,6 +4,9 @@ module.exports = (sequelize, Sequelize) => {
         is_eligible: {
             type: Sequelize.BOOLEAN,
             defaultValue: true
+        },
+        class_number: {
+            type: Sequelize.INTEGER
         }
     });
 
