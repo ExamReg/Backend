@@ -8,6 +8,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         value: {
             type: Sequelize.STRING
+        },
+        create_time: {
+            type: Sequelize.STRING
         }
     });
 

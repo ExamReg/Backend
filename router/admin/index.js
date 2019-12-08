@@ -10,14 +10,14 @@ const api = express.Router();
 api.post("/register", userController.registerAccountAdmin);
 api.post("/login", userController.loginWithAccountAdmin);
 
-api.post("/courses", upload, courseController.createNewCourse);
-api.get("/courses", courseController.getCourses);
+api.post("/courses", verifyAdmin("admin"), upload, courseController.createNewCourse);
+api.get("/courses", verifyAdmin("admin"), courseController.getCourses);
 
 api.get("/test", verifyAdmin("admin"), (req, res) => {
     return res.json({success: true})
-})
+});
 
-api.post("/students/import", upload, studentController.importStudentFromExcelFile);
+api.post("/students/import", verifyAdmin("admin"), upload, studentController.importStudentFromExcelFile);
 
 
 
