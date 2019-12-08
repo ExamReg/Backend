@@ -97,10 +97,11 @@ async function getCourses(req, res){
         }
         let sql = "SELECT\n" +
             "    C.id_course,\n" +
+            "    CS.id_cs,\n" +
             "    course_name,\n" +
             "    is_done,\n" +
             "    S.id_semester," +
-            "    create_time," +
+            "    C.create_time," +
             "    S.value\n";
             if(course_name){
                 sql = sql + ",MATCH(course_name) AGAINST(:course_name) AS score\n"

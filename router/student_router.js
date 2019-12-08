@@ -1,7 +1,7 @@
 const express = require("express");
-const userController = require("../../controllers/student/user");
+const userController = require("../controllers/student/user");
 const api = express.Router();
-const verifyToken = require("../../middleware/verifyToken");
+const verifyToken = require("../middleware/verifyToken");
 
 api.post("/login", userController.loginStudent);
 

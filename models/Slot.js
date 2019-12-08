@@ -9,6 +9,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         date: {
             type: Sequelize.STRING
+        },
+        maximum_seating: {
+            type: Sequelize.INTEGER
         }
     });
 
