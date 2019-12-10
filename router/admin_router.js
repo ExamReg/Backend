@@ -20,6 +20,7 @@ api.get("/rooms", verifyToken("admin"), roomController.getRooms);
 api.post("/rooms", verifyToken("admin"), roomController.createRoom);
 
 api.post("/students/import", verifyToken("admin"), upload, studentController.importStudentFromExcelFile);
+api.get("/students", verifyToken("admin"), studentController.getStudents);
 
 
 api.post("/exams", verifyToken("admin"), examController.createExam);

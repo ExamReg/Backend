@@ -14,6 +14,14 @@ module.exports = (sequelize, Sequelize) => {
         password: {
             type: Sequelize.TEXT
         }
+    },{
+        indexes: [
+            {
+                type: 'FULLTEXT',
+                name: 'name',
+                fields: ['name']
+            }
+        ]
     });
 
     Student.associate = (models) => {

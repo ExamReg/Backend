@@ -38,6 +38,48 @@ async function importStudentFromExcelFile(req, res){
     }
 }
 
+async function getStudents(req, res){
+    try{
+        let {text, page_size, page_number} = req.query;
+        if(page_number){
+            page_number = parseInt(page_number);
+        }else{
+            page_number = 0
+        }
+        if(page_size){
+            page_size = parseInt(page_size);
+        }else{
+            page_size = 20
+        }
+        let sql = "select id_student, name, birthday from Student ";
+        if(text && text.match(/^-{0,1}\d+$/)){
+            text = "%" + text + "%";
+            sql =sql + " where id_student like :text "
+        }else if(text && !text.match(/^-{0,1}\d+$/)){
+            sql = sql + "where match(name) against(:text) > 0"
+        }
+        if(text && !text.match(/^-{0,1}\d+$/)){
+            sql = sql + " order by match(name) against(:text) DESC"
+        }else{
+            sql = sql + " order by id_student ASC"
+        }
+        sql = sql + " limit :limit offset :offset ";
+        let students = await db.sequelize.query(sql, {
+            replacements: {
+                offset: page_number * page_size,
+                limit: page_size,
+                text: text
+            },
+            type: db.Sequelize.QueryTypes.SELECT
+        });
+        return res.json(response.buildSuccess({students}))
+    }
+    catch(err){
+        console.log("getStudents: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 async function createStudent(req, res){
     try{
         let {mssv, name, birthday} = req.body;
@@ -113,5 +155,6 @@ module.exports = {
     importStudentFromExcelFile,
     createStudent,
     updateStudent,
-    resetPassword
+    resetPassword,
+    getStudents
 };
