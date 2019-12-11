@@ -63,7 +63,23 @@ async function changePassword(req, res){
     }
 }
 
+async function getProfileStudent(req, res){
+    try{
+        let profile = await db.Student.findOne({
+            where: {
+                id_student: req.tokenData.id_student
+            }
+        });
+        return res.json(response.buildSuccess({profile}))
+    }
+    catch(err){
+        console.log("getProfileStudent: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 module.exports = {
     loginStudent,
-    changePassword
+    changePassword,
+    getProfileStudent
 };

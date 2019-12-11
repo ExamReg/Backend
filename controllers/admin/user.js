@@ -78,7 +78,23 @@ async function loginWithAccountAdmin(req, res){
     }
 }
 
+async function getProfileAdmin(req, res){
+    try{
+        let profile = await db.User.findOne({
+            where: {
+                id_user: req.tokenData.id_user
+            }
+        });
+        return res.json(response.buildSuccess({profile}))
+    }
+    catch(err){
+        console.log("getProfileAdmin: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 module.exports = {
     registerAccountAdmin,
-    loginWithAccountAdmin
+    loginWithAccountAdmin,
+    getProfileAdmin
 };

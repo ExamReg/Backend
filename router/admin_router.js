@@ -11,6 +11,7 @@ const api = express.Router();
 
 api.post("/register", userController.registerAccountAdmin);
 api.post("/login", userController.loginWithAccountAdmin);
+api.get("/profile", verifyToken("admin"), userController.getProfileAdmin);
 
 
 api.post("/courses", verifyToken("admin"), upload, courseController.createNewCourse);

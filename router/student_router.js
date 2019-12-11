@@ -4,6 +4,7 @@ const api = express.Router();
 const verifyToken = require("../middleware/verifyToken");
 
 api.post("/login", userController.loginStudent);
+api.get("/profile", verifyToken("student"), userController.getProfileStudent);
 
 api.put("/users/password", verifyToken("student"), userController.changePassword);
 
