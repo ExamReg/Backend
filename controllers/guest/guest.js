@@ -17,6 +17,8 @@ async function getSemester(req, res){
 }
 
 
+
+
 module.exports =  {
     getSemester
 };

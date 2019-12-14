@@ -96,11 +96,10 @@ async function getExams(req, res) {
         }
         let sql;
         if(by_course === "false"){
-            sql = "select S.*, R.location, C.course_name, C.id_course from Exam E\n" +
+            sql = "select S.*, (select location from Room where id_room = S.id_room) as location, \n" +
+                "\t\t(select course_name from Course where id_course = CS.id_course) as course_name from Exam E\n" +
                 "    inner join Slot S on E.id_exam = S.id_exam\n" +
-                "\tinner join Room R on S.id_room = R.id_room\n" +
-                "    inner join CourseSemester CS on CS.id_cs = E.id_cs\n" +
-                "    inner join Course C on C.id_course = CS.id_course \n";
+                "    inner join CourseSemester CS on CS.id_cs = E.id_cs\n ";
                 if(id_semester){
                     sql = sql + "where CS.id_semester = :id_semester\n";
                 }
