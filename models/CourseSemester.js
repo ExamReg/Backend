@@ -5,7 +5,11 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true
-        }
+        },
+        is_done: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        },
     });
 
     CourseSemester.associate = (models) => {
