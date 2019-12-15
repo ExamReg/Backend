@@ -47,9 +47,56 @@ async function getExams(req, res){
     }
 }
 
+async function getExamsRegistered(req, res){
+    try{
+        let {id_semester} = req.query;
+        let sql = "SELECT \n" +
+            "    Slot.*,\n" +
+            "    CSe.id_course,\n" +
+            "    (SELECT \n" +
+            "            course_name\n" +
+            "        FROM\n" +
+            "            Course\n" +
+            "        WHERE\n" +
+            "            id_course = CSe.id_course) as course_name\n" +
+            "FROM\n" +
+            "    (SELECT \n" +
+            "        *\n" +
+            "    FROM\n" +
+            "        CourseSemester\n" +
+            "    WHERE\n" +
+            "        id_semester = :id_semester) CSe\n" +
+            "        INNER JOIN\n" +
+            "    CourseStudent CSt ON CSt.id_cs = CSe.id_cs\n" +
+            "        INNER JOIN\n" +
+            "    Exam E ON E.id_cs = CSe.id_cs\n" +
+            "        INNER JOIN\n" +
+            "    Slot ON Slot.id = E.id_exam\n" +
+            "        INNER JOIN\n" +
+            "    (SELECT \n" +
+            "        *\n" +
+            "    FROM\n" +
+            "        StudentSlot\n" +
+            "    WHERE\n" +
+            "        id_student = :id_student) SS ON SS.id_slot = Slot.id;\n"
+        let exams = await db.sequelize.query(sql, {
+            replacements: {
+                id_student: req.tokenData.id_student,
+                id_semester: id_semester
+            },
+            type: db.Sequelize.QueryTypes.SELECT
+        });
+        return res.json(response.buildSuccess({exams}));
+    }
+    catch(err){
+        console.log("getExamsRegistered: ", err.message);
+
+    }
+}
 
 module.exports = {
-    getExams
+    getExams,
+    getExamsRegistered
 };
 
 
