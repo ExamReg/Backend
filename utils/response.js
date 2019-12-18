@@ -4,7 +4,8 @@ module.exports.buildSuccess = (data) => {
     }
     return {
         success: true,
-        data: data
+        data: data,
+        code: 20
     }
 };
 
@@ -14,13 +15,15 @@ module.exports.buildFail = (msg) => {
     }
     return {
         success: false,
-        message: msg
+        message: msg,
+        code: 22
     }
 };
 
 module.exports.buildUnauthorized = () => {
     return {
         success: false,
-        message: "unAuthorized"
+        message: "unAuthorized",
+        code: 23
     }
 };

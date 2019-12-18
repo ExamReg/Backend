@@ -67,7 +67,7 @@ async function loginWithAccountAdmin(req, res){
         let token = await jwt.sign({
             id_user: user.dataValues.id_user
         }, config.get("secret_key_admin"), {
-            //expiresIn: config.get("time_expired")
+            expiresIn: config.get("time_expired")
         });
         let data = {token};
         res.json(response.buildSuccess(data))
