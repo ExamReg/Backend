@@ -63,16 +63,23 @@ async function getStudents(req, res){
         }else{
             sql = sql + " order by id_student ASC"
         }
-        sql = sql + " limit :limit offset :offset ";
         let students = await db.sequelize.query(sql, {
             replacements: {
-                offset: page_number * page_size,
-                limit: page_size,
                 text: text
             },
             type: db.Sequelize.QueryTypes.SELECT
         });
-        return res.json(response.buildSuccess({students}))
+        let listStudent = [];
+        for(let i = page_number * page_size; i < page_size * (page_number + 1); i++){
+            if(students[i]){
+                listStudent.push(students[i]);
+            }
+        }
+        let data = {
+            count: students.length,
+            students: listStudent
+        };
+        return res.json(response.buildSuccess(data))
     }
     catch(err){
         console.log("getStudents: ", err.message);

@@ -16,6 +16,8 @@ api.get("/profile", verifyToken("admin"), userController.getProfileAdmin);
 
 api.post("/courses", verifyToken("admin"), upload, courseController.createNewCourse);
 api.get("/courses", verifyToken("admin"), courseController.getCourses);
+api.get("/semesters", verifyToken("admin"), courseController.getSemester);
+api.post("/semesters", verifyToken("admin"), courseController.createSemester);
 
 api.get("/rooms", verifyToken("admin"), roomController.getRooms);
 api.post("/rooms", verifyToken("admin"), roomController.createRoom);
