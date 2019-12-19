@@ -141,7 +141,7 @@ async function resetPassword(req, res){
         });
         if(student){
             let salt = await bcrypt.genSalt(config.get("saltRound"));
-            let password = await bcrypt.hash(mssv.toString(), salt);
+            let password = await bcrypt.hash(student.id_student.toString(), salt);
             await Student.update({
                 password: password
             },{

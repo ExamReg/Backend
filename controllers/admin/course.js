@@ -194,9 +194,36 @@ async function createSemester(req, res){
     }
 }
 
+async function updateSemester(req, res){
+    try{
+        let {value} = req.body;
+        let {id_semester} = req.params;
+        let row_semester = await Semester.findOne({
+            where: {
+                id_semester: id_semester
+            }
+        });
+        if(row_semester){
+            await Semester.update({
+                value: value
+            },{
+                id_semester: id_semester
+            })
+        }else{
+            throw new Error("Kì học không tồn tại.")
+        }
+        return res.json(response.buildSuccess({}));
+    }
+    catch(err){
+        console.log("createSemester: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 module.exports = {
     createNewCourse,
     getCourses,
     getSemester,
-    createSemester
+    createSemester,
+    updateSemester
 };

@@ -18,13 +18,16 @@ api.post("/courses", verifyToken("admin"), upload, courseController.createNewCou
 api.get("/courses", verifyToken("admin"), courseController.getCourses);
 api.get("/semesters", verifyToken("admin"), courseController.getSemester);
 api.post("/semesters", verifyToken("admin"), courseController.createSemester);
+api.post("/semesters/:id_semester", verifyToken("admin"), courseController.updateSemester);
 
 api.get("/rooms", verifyToken("admin"), roomController.getRooms);
 api.post("/rooms", verifyToken("admin"), roomController.createRoom);
 
 api.post("/students/import", verifyToken("admin"), upload, studentController.importStudentFromExcelFile);
 api.get("/students", verifyToken("admin"), studentController.getStudents);
+api.put("/students/:id_student", verifyToken("admin"), studentController.updateStudent);
 
+api.put("/students/:id_student/passwords", verifyToken("admin"), studentController.resetPassword);
 
 api.post("/exams", verifyToken("admin"), examController.createExam);
 api.get("/exams", verifyToken("admin"), examController.getExams);
