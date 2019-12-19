@@ -56,10 +56,10 @@ async function getStudents(req, res){
             text = "%" + text + "%";
             sql =sql + " where id_student like :text "
         }else if(text && !text.match(/^-{0,1}\d+$/)){
-            sql = sql + "where match(name) against(:text) > 0"
+            sql = sql + "where match(name) against(:text IN NATURAL LANGUAGE MODE) > 0"
         }
         if(text && !text.match(/^-{0,1}\d+$/)){
-            sql = sql + " order by match(name) against(:text) DESC"
+            sql = sql + " order by match(name) against(:text IN NATURAL LANGUAGE MODE) DESC"
         }else{
             sql = sql + " order by id_student ASC"
         }

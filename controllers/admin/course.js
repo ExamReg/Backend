@@ -85,9 +85,10 @@ async function createNewCourse(req, res){
 
 async function getCourses(req, res){
     try{
-        let {id_semester, course_name, id_course} = req.query;
-        if(id_course){
-            id_course = "%" + id_course + "%";
+        let {id_semester, text} = req.query;
+        let idCourse = "";
+        if(text){
+            idCourse = "%" + text + "%";
         }
         if(!id_semester){
             id_semester = "";
@@ -100,7 +101,7 @@ async function getCourses(req, res){
             "    S.id_semester," +
             "    C.create_time," +
             "    S.value\n";
-            if(course_name){
+            if(text){
                 sql = sql + ",MATCH(course_name) AGAINST(:course_name) AS score\n"
             }
             sql = sql + "FROM\n" +
@@ -111,23 +112,20 @@ async function getCourses(req, res){
             if(id_semester !== ""){
                 sql = sql + " AND CS.id_semester = :id_semester \n";
             }
-            if(id_course){
-                sql = sql + " AND id_course LIKE :id_course \n"
-            }
-            if(course_name){
-                sql = sql + " AND MATCH(course_name) AGAINST(\"dung phat\") > 0\n";
+            if(text){
+                sql = sql + " AND (C.id_course LIKE :id_course or MATCH(course_name) AGAINST(:course_name) > 0) "
             }
             sql = sql + " ORDER BY\n";
-            if(course_name){
+            if(text){
                 sql = sql + "score DESC"
             }else{
                 sql = sql + "create_time DESC"
             }
             let courses = await db.sequelize.query(sql, {
                replacements: {
-                   id_course: id_course,
+                   id_course: idCourse,
                    id_semester: id_semester,
-                   course_name: course_name
+                   course_name: text
                },
                 type: db.sequelize.QueryTypes.SELECT
             });
