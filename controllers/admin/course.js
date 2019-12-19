@@ -9,21 +9,18 @@ const convertExcelToJson = require("../../utils/convertExcelToJson");
 
 async function createNewCourse(req, res){
     try{
-        let {id_course, course_name, semester, class_number} = req.body;
-        if(!id_course || !course_name || !semester || !class_number){
+        let {id_course, course_name, id_semester, class_number} = req.body;
+        if(!id_course || !course_name || !id_semester || !class_number){
             throw new Error("Something missing.")
         }
         let jsonData = await convertExcelToJson(req.file);
         let row_semester = await Semester.findOne({
             where: {
-                value: semester
+                id_semester: id_semester
             }
         });
         if(!row_semester){
-            row_semester = await Semester.create({
-                value: semester,
-                create_time: Date.now()
-            })
+            throw new Error("Kì học không tồn tại.")
         }
         let course = await Course.findOrCreate({
             where: {
@@ -39,15 +36,15 @@ async function createNewCourse(req, res){
         let course_semester = await CourseSemester.findOne({
             where: {
                 id_course: id_course,
-                id_semester: row_semester.dataValues.id_semester
+                id_semester: id_semester
             }
         });
         if(course_semester){
-            throw new Error("Course này đã tồn tại.")
+            throw new Error("Khóa học này đã có trong học kì này.")
         }
         course_semester = await CourseSemester.create({
             id_course,
-            id_semester: row_semester.dataValues.id_semester
+            id_semester: id_semester
         });
         try{
             for(let e of jsonData){
@@ -143,7 +140,46 @@ async function getCourses(req, res){
     }
 }
 
+async function getSemester(req, res){
+    try{
+        let semesters = await db.Semester.findAll({
+            order: [
+                ['create_time', 'ASC']
+            ]
+        });
+        return res.json(response.buildSuccess({semesters}))
+    }
+    catch(err){
+        console.log("getSemester", err.message);
+        return res.json(response.buildFail(err.message))
+    }
+}
+
+async function createSemester(req, res){
+    try{
+        let {value} = req.body;
+        let row_semester = await Semester.findOne({
+            where: {
+                value: semester
+            }
+        });
+        if(!row_semester){
+            row_semester = await Semester.create({
+                value: value,
+                create_time: Date.now()
+            })
+        }
+        return res.json(response.buildSuccess({}));
+    }
+    catch(err){
+        console.log("createSemester: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 module.exports = {
     createNewCourse,
-    getCourses
+    getCourses,
+    getSemester,
+    createSemester
 };
