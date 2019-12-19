@@ -85,7 +85,17 @@ async function createNewCourse(req, res){
 
 async function getCourses(req, res){
     try{
-        let {id_semester, text} = req.query;
+        let {id_semester, text, page_size, page_number} = req.query;
+        if(page_number){
+            page_number = parseInt(page_number);
+        }else{
+            page_number = 0
+        }
+        if(page_size){
+            page_size = parseInt(page_size);
+        }else{
+            page_size = 20
+        }
         let idCourse = "";
         if(text){
             idCourse = "%" + text + "%";
@@ -129,8 +139,17 @@ async function getCourses(req, res){
                },
                 type: db.sequelize.QueryTypes.SELECT
             });
-
-            return res.json(response.buildSuccess({courses}))
+            let listCourse = [];
+            for(let i = page_size * page_number; i < page_size * ( page_number + 1); i++){
+                if(courses[i]){
+                    listCourse.push(courses[i]);
+                }
+            }
+            let data = {
+                count: courses.length,
+                course: listCourse
+            };
+            return res.json(response.buildSuccess(data));
     }
     catch(err){
         console.log("getCourses: ", err.message);
