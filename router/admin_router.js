@@ -18,7 +18,7 @@ api.post("/courses", verifyToken("admin"), upload, courseController.createNewCou
 api.get("/courses", verifyToken("admin"), courseController.getCourses);
 api.get("/semesters", verifyToken("admin"), courseController.getSemester);
 api.post("/semesters", verifyToken("admin"), courseController.createSemester);
-api.post("/semesters/:id_semester", verifyToken("admin"), courseController.updateSemester);
+api.put("/semesters/:id_semester", verifyToken("admin"), courseController.updateSemester);
 
 api.get("/rooms", verifyToken("admin"), roomController.getRooms);
 api.post("/rooms", verifyToken("admin"), roomController.createRoom);

@@ -177,7 +177,7 @@ async function createSemester(req, res){
         let {value} = req.body;
         let row_semester = await Semester.findOne({
             where: {
-                value: semester
+                value: value
             }
         });
         if(!row_semester){
@@ -207,7 +207,9 @@ async function updateSemester(req, res){
             await Semester.update({
                 value: value
             },{
-                id_semester: id_semester
+                where: {
+                    id_semester: id_semester
+                }
             })
         }else{
             throw new Error("Kì học không tồn tại.")
