@@ -147,7 +147,7 @@ async function getCourses(req, res){
             }
             let data = {
                 count: courses.length,
-                course: listCourse
+                courses: listCourse
             };
             return res.json(response.buildSuccess(data));
     }
