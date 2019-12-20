@@ -93,8 +93,44 @@ async function getProfileAdmin(req, res){
     }
 }
 
+async function changePasswordAdmin(req, res){
+    try{
+        let {new_password, old_password} = req.body;
+        if(!new_password || !old_password){
+            throw new Error("Something missing.")
+        }
+        if(new_password.length < 8){
+            throw new Error("Mật khẩu phải có ít nhất 8 kí tự.")
+        }
+        let user = await db.User.findOne({
+            where: {
+                id_user: req.tokenData.id_user
+            }
+        });
+        let check = await bcrypt.compare(old_password.toString(), user.dataValues.password);
+        if(!check){
+            throw new Error("Mật khẩu cũ không chính xác.")
+        }
+        let salt = await bcrypt.genSalt(config.get("saltRound"));
+        let newPassword = await bcrypt.hash(new_password.toString(), salt);
+        await db.User.update({
+            password: newPassword
+        },{
+            where: {
+                id_user: req.tokenData.id_user
+            }
+        });
+        res.json(response.buildSuccess({}));
+    }
+    catch(err){
+        console.log("changePasswordAdmin: ", err.message);
+        return res.json(response.buildFail(err.message))
+    }
+}
+
 module.exports = {
     registerAccountAdmin,
     loginWithAccountAdmin,
-    getProfileAdmin
+    getProfileAdmin,
+    changePasswordAdmin
 };
