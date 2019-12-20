@@ -4,6 +4,9 @@ const config = require("config");
 
 const verifyToken = role => {
     return (req, res, next) => {
+        if(!req.headers['token']){
+            throw new Error("Token missing");
+        }
         let secretKey = "";
         if(role === "admin"){
             secretKey = config.get("secret_key_admin");
