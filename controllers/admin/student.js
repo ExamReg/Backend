@@ -7,6 +7,9 @@ const bcrypt = require("bcrypt");
 
 async function importStudentFromExcelFile(req, res){
     try{
+        if(!req.file){
+            throw new Error("File missing");
+        }
         let jsonData = await convertExcelToJson(req.file);
         try{
             for(let e of jsonData){
