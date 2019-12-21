@@ -80,10 +80,7 @@ async function createExam(req, res) {
 
 async function getExams(req, res) {
     try {
-        let {id_semester, by_course, page_size, page_number} = req.query;
-        if (!by_course) {
-            by_course = "false";
-        }
+        let {id_semester, page_size, page_number, text, time_from, time_end} = req.query;
         if (!page_number) {
             page_number = 0
         } else {
@@ -94,33 +91,52 @@ async function getExams(req, res) {
         } else {
             page_size = parseInt(page_size)
         }
-        let sql;
-        if(by_course === "false"){
-            sql = "select S.*, (select location from Room where id_room = S.id_room) as location, \n" +
-                "\t\t(select course_name from Course where id_course = CS.id_course) as course_name from Exam E\n" +
-                "    inner join Slot S on E.id_exam = S.id_exam\n" +
-                "    inner join CourseSemester CS on CS.id_cs = E.id_cs\n ";
-                if(id_semester){
-                    sql = sql + "where CS.id_semester = :id_semester\n";
-                }
-                sql = sql + " order by date DESC, time_start ASC;"
-        }else if(by_course === "true"){
-            sql = "select * from Exam E \n" +
-                "\tinner join CourseSemester CS on CS.id_cs = E.id_cs\n" +
-                "    inner join Course C on C.id_course = CS.id_course\n";
-            if(id_semester){
-                sql = sql + " where CS.id_semester = :id_semester"
-            }
+        let sql = "SELECT \n" +
+            "    C.course_name,\n" +
+            "    C.id_course,\n" +
+            "    S.time_start,\n" +
+            "    S.time_end,\n" +
+            "    S.date,\n" +
+            "    S.maximum_seating,\n" +
+            "    R.location\n" +
+            "FROM\n" +
+            "    (SELECT \n" +
+            "        *\n" +
+            "    FROM\n" +
+            "        CourseSemester\n" +
+            "    WHERE\n" +
+            "        id_semester = :id_semester) AS CSe\n" +
+            "        INNER JOIN\n";
+        if(text){
+            sql = sql + "(select * from Course where match(course_name) against(:text) > 0) as C on C.id_course = CSe.id_course\n";
+        }else{
+            sql = sql + "    Course C ON C.id_course = CSe.id_course\n";
         }
-        let constrain = {};
-        if(id_semester){
-            constrain.id_semester = id_semester;
-        }
+            sql = sql + "        INNER JOIN\n" +
+            "    Exam E ON E.id_cs = CSe.id_cs\n" +
+            "        INNER JOIN\n" +
+            "    Slot S ON S.id_exam = E.id_exam\n" +
+            "        INNER JOIN\n" +
+            "    Room R ON R.id_room = S.id_room" +
+                " order by S.date ASC";
         let exams = await db.sequelize.query(sql, {
-            replacements: constrain,
+            replacements: {
+                id_semester: id_semester,
+                text: text
+            },
             type: db.Sequelize.QueryTypes.SELECT
         });
-        return res.json(response.buildSuccess({exams}))
+        let result = [];
+        for(let i=page_size * page_number; i < page_size * (page_number + 1); i++){
+            if(exams[i]){
+                result.push(exams[i])
+            }
+        }
+        let data = {
+            count: exams.length,
+            exams: result
+        };
+        return res.json(response.buildSuccess(data))
     } catch (err) {
         console.log("getExams: ", err.message);
         return res.json(response.buildFail(err.message))
