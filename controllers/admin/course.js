@@ -222,10 +222,80 @@ async function updateSemester(req, res){
     }
 }
 
+async function getCourse(req, res){
+    try{
+        let {id_cs} = req.params;
+        let sql = "SELECT \n" +
+            "    C.course_name, S.value AS semester, C.id_course\n" +
+            "FROM\n" +
+            "    CourseSemester CS\n" +
+            "        INNER JOIN\n" +
+            "    Course C ON C.id_course = CS.id_course\n" +
+            "        INNER JOIN\n" +
+            "    Semester S ON S.id_semester = CS.id_semester\n" +
+            "where id_cs = :id_cs";
+        let course = await db.sequelize.query(sql, {
+            replacements: {
+                id_cs: id_cs
+            },
+            type: db.Sequelize.QueryTypes.SELECT
+        });
+        if(course.length > 0){
+            course = course[0];
+        }else{
+            course = {};
+        }
+        return res.json(response.buildSuccess({course}))
+    }
+    catch(err){
+        console.log("getCourse: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
+async function getStudentsInCourse(req, res){
+    try{
+        let {id_cs} = req.params;
+        let {text} = req.query;
+        let one_word = "%" + text + "%";
+        let sql = "SELECT \n" +
+            "    S.id_student, S.name, CStu.is_eligible\n" +
+            "FROM\n" +
+            "    CourseStudent CStu\n" +
+            "        INNER JOIN\n" +
+            "    Student S ON S.id_student = CStu.id_student\n" +
+            "WHERE\n" +
+            "    CStu.id_cs = :id_cs ";
+        if(text){
+            sql = sql + "and (S.id_student like :one_word or match(name) against(:text) > 0)"
+        }
+        if(text){
+            sql = sql + " order by match(name) against(:text) DESC"
+        }else{
+            sql = sql + " order by S.id_student ASC"
+        }
+        let students = await db.sequelize.query(sql, {
+            replacements: {
+                id_cs: id_cs,
+                text: text,
+                one_word
+            },
+            type: db.Sequelize.QueryTypes.SELECT
+        });
+        return res.json(response.buildSuccess({students}))
+    }
+    catch(err){
+        console.log("getStudentInCourse: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 module.exports = {
     createNewCourse,
     getCourses,
     getSemester,
     createSemester,
-    updateSemester
+    updateSemester,
+    getCourse,
+    getStudentsInCourse
 };

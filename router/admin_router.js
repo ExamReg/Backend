@@ -17,6 +17,10 @@ api.put("/passwords", verifyToken("admin"), userController.changePasswordAdmin);
 
 api.post("/courses", verifyToken("admin"), upload, courseController.createNewCourse);
 api.get("/courses", verifyToken("admin"), courseController.getCourses);
+api.get("/courses/:id_cs", verifyToken("admin"), courseController.getCourse);
+api.get("/courses/:id_cs/students", verifyToken("admin"), courseController.getStudentsInCourse);
+
+
 api.get("/semesters", verifyToken("admin"), courseController.getSemester);
 api.post("/semesters", verifyToken("admin"), courseController.createSemester);
 api.put("/semesters/:id_semester", verifyToken("admin"), courseController.updateSemester);
