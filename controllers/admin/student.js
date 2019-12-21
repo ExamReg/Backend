@@ -10,6 +10,10 @@ async function importStudentFromExcelFile(req, res){
         if(!req.file){
             throw new Error("File missing");
         }
+        let typeFile = req.file.originalname.split(".")[req.file.originalname.split(".").length - 1];
+        if( typeFile !== "xlsx" && typeFile !== "csv"){
+            throw new Error("Định dạng file không hợp lệ.")
+        }
         let jsonData = await convertExcelToJson(req.file);
         try{
             for(let e of jsonData){

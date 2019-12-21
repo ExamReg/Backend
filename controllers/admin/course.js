@@ -13,6 +13,13 @@ async function createNewCourse(req, res){
         if(!id_course || !course_name || !id_semester || !class_number){
             throw new Error("Something missing.")
         }
+        if(!req.file){
+            throw new Error('File missing')
+        }
+        let typeFile = req.file.originalname.split(".")[req.file.originalname.split(".").length - 1];
+        if( typeFile !== "xlsx" && typeFile !== "csv"){
+            throw new Error("Định dạng file không hợp lệ.")
+        }
         let jsonData = await convertExcelToJson(req.file);
         let row_semester = await Semester.findOne({
             where: {
