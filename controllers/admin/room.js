@@ -46,7 +46,36 @@ async function createRoom(req, res){
     }
 }
 
+async function changeInformationRoom(req, res){
+    try{
+        let {id_room} = req.params;
+        let {location, maximum_seating} = req.body;
+        let room = await Room.findOne({
+            where: {
+                id_room: id_room
+            }
+        });
+        if(!room){
+            throw new Error("Phòng không tồn tại.")
+        }
+        await Room.update({
+            location: location,
+            maximum_seating: maximum_seating
+        },{
+            where: {
+                id_room: id_room
+            }
+        });
+        return res.json(response.buildSuccess({}));
+    }
+    catch(err){
+        console.log("createRoom: ", err.message);
+        return res.json(response.buildFail(err.message))
+    }
+}
+
 module.exports = {
     getRooms,
-    createRoom
+    createRoom,
+    changeInformationRoom
 };

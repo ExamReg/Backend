@@ -23,6 +23,7 @@ api.put("/semesters/:id_semester", verifyToken("admin"), courseController.update
 
 api.get("/rooms", verifyToken("admin"), roomController.getRooms);
 api.post("/rooms", verifyToken("admin"), roomController.createRoom);
+api.put("/rooms/:id_room", verifyToken("admin"), roomController.changeInformationRoom);
 
 api.post("/students/import", verifyToken("admin"), upload, studentController.importStudentFromExcelFile);
 api.get("/students", verifyToken("admin"), studentController.getStudents);
