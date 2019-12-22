@@ -33,6 +33,9 @@ api.put("/rooms/:id_room", verifyToken("admin"), roomController.changeInformatio
 api.post("/students/import", verifyToken("admin"), upload, studentController.importStudentFromExcelFile);
 api.get("/students", verifyToken("admin"), studentController.getStudents);
 api.put("/students/:id_student", verifyToken("admin"), studentController.updateStudent);
+api.put("/courses/:id_cs/students/:id_student/status", verifyToken("admin"), studentController.changeStatusStudentInCourseSemester);
+api.delete("/courses/:id_cs/students/:id_student", verifyToken("admin"), studentController.removeStudentFromCourse);
+
 
 api.put("/students/:id_student/passwords", verifyToken("admin"), studentController.resetPassword);
 

@@ -164,11 +164,73 @@ async function resetPassword(req, res){
     }
 }
 
+async function changeStatusStudentInCourseSemester(req, res){
+    try{
+        let {id_cs, id_student} = req.params;
+        let {is_eligible} = req.body;
+        if(!id_cs || !id_student || is_eligible === ""){
+            throw new Error("Something missing.")
+        }
+        let student = await db.CourseStudent.findOne({
+            where: {
+                id_cs: id_cs,
+                id_student: id_student
+            }
+        });
+        if(!student){
+            throw new Error("Sinh viên này không có trong môn này.")
+        }
+        await db.CourseStudent.update({
+            is_eligible: is_eligible
+        },{
+            where: {
+                id_student,
+                id_cs
+            }
+        });
+        return res.json(response.buildSuccess({}));
+    }
+    catch(err){
+        console.log("changeStatusStudentInCourseSemester: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
+async function removeStudentFromCourse(req, res){
+    try{
+        let {id_cs, id_student} = req.params;
+        if(!id_student || !id_cs){
+            throw new Error("Something missing.")
+        }
+        let student = await db.CourseStudent.findOne({
+            where: {
+                id_cs: id_cs,
+                id_student: id_student
+            }
+        });
+        if(!student){
+            throw new Error("Sinh viên này không có trong môn này.")
+        }
+        await db.CourseStudent.destroy({
+            where: {
+                id_cs,
+                id_student
+            }
+        });
+        return res.json(response.buildSuccess({}))
+    }
+    catch(err){
+        console.log("removeStudentFromCourse: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
 
 module.exports = {
     importStudentFromExcelFile,
     createStudent,
     updateStudent,
     resetPassword,
-    getStudents
+    getStudents,
+    changeStatusStudentInCourseSemester,
+    removeStudentFromCourse
 };
