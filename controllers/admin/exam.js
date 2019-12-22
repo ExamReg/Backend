@@ -115,7 +115,7 @@ async function getExams(req, res) {
             "    Slot S ON S.id_exam = E.id_exam\n" +
             "        INNER JOIN\n" +
             "    Room R ON R.id_room = S.id_room" +
-                " order by S.date ASC";
+                " order by S.start_from ASC";
         let exams = await db.sequelize.query(sql, {
             replacements: {
                 id_semester: id_semester,
