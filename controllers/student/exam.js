@@ -21,6 +21,7 @@ async function getExams(req, res){
             "            id_course = CSe.id_course) AS course_name,\n" +
             "    S.id AS id_slot,\n" +
             "    CSe.id_cs,\n" +
+            "    CSe.id_course," +
             "    (SELECT \n" +
             "            is_eligible\n" +
             "        FROM\n" +
@@ -28,7 +29,7 @@ async function getExams(req, res){
             "        WHERE\n" +
             "            id_student = :id_student\n" +
             "                AND id_cs = CSe.id_cs) as is_eligible,\n" +
-            "    sum(if(SS.id_student is not null, 1, 0)) as totalRegistered\n" +
+            "    sum(if(SS.id_student is not null, 1, 0)) as seated\n" +
             "FROM\n" +
             "    (SELECT \n" +
             "        *\n" +
