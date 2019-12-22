@@ -101,6 +101,9 @@ async function updateExam(req, res) {
         // check phòng còn trống hay không
         let slot = await Slot.findOne({
             where: {
+                id: {
+                    [db.Sequelize.Op.ne]: id_slot
+                },
                 [db.Sequelize.Op.or]: [
                     {
                         time_end: {
@@ -128,7 +131,7 @@ async function updateExam(req, res) {
         }else{
             slot = await Slot.findOne({
                 where: {
-                    id_slot: id_slot
+                    id: id_slot
                 }
             });
             if(!slot){
@@ -139,6 +142,10 @@ async function updateExam(req, res) {
                 time_end: time_end,
                 id_room: id_room,
                 maximum_seating: maximum_seating
+            },{
+                where: {
+                    id: id_slot
+                }
             });
         }
         return res.json(response.buildSuccess({}))
