@@ -10,6 +10,6 @@
   "key_register_admin": "ThisIsKeyTest",
   "saltRound": 10,
   "secret_key_admin": "jkasqwemasaskqjweoakqwejhqsdflkqwoasdfjkl",
-  "time_expired": "1h",
+  "time_expired": "10000h",
   "secret_key_student": "eyJhbGciOiJSUzM4NCIsInR5cCI6IkpXVCJ9"
 }
