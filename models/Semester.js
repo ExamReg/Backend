@@ -11,6 +11,12 @@ module.exports = (sequelize, Sequelize) => {
         },
         create_time: {
             type: Sequelize.STRING
+        },
+        register_from: {
+            type: Sequelize.STRING,
+        },
+        register_to: {
+            type: Sequelize.STRING
         }
     });
 

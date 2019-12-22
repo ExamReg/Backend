@@ -5,10 +5,13 @@ const Exam = db.Exam;
 const response = require("../../utils/response");
 
 async function createExam(req, res) {
-    let {time_start, time_end, date, id_cs, id_room, maximum_seating} = req.body;
+    let {time_start, time_end, id_cs, id_room, maximum_seating} = req.body;
     try {
-        if (!time_start || !time_end || !date || !id_cs || !id_room || !maximum_seating) {
+        if (!time_start || !time_end || !id_cs || !id_room || !maximum_seating) {
             throw new Error("Something missing.")
+        }
+        if(time_end <= time_start){
+            throw new Error("Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc");
         }
         let room = await Room.findOne({
             where: {
@@ -34,22 +37,23 @@ async function createExam(req, res) {
         // check phòng còn trống hay không
         let slot = await Slot.findOne({
             where: {
-                date: date,
                 [db.Sequelize.Op.or]: [
                     {
-                        time_start: {
-                            [db.Sequelize.Op.lte]: time_end
-                        },
                         time_end: {
-                            [db.Sequelize.Op.gte]: time_end
+                            [db.Sequelize.Op.between]: {time_start, time_end}
                         }
                     },
                     {
                         time_start: {
-                            [db.Sequelize.Op.gte]: time_start
+                            [db.Sequelize.Op.between]: {time_start, time_end}
+                        }
+                    },
+                    {
+                        time_start: {
+                            [db.Sequelize.Op.lte]: time_start
                         },
                         time_end: {
-                            [db.Sequelize.Op.lte]: time_start
+                            [db.Sequelize.Op.gte]: time_end
                         }
                     }
                 ]
@@ -63,7 +67,6 @@ async function createExam(req, res) {
             time_end: time_end,
             id_room: id_room,
             id_exam: exam.dataValues.id_exam,
-            date: date,
             maximum_seating: maximum_seating
         });
         return res.json(response.buildSuccess({}))
@@ -91,7 +94,6 @@ async function getExams(req, res) {
             "    C.id_course,\n" +
             "    S.time_start,\n" +
             "    S.time_end,\n" +
-            "    S.date,\n" +
             "    S.maximum_seating,\n" +
             "    R.location\n" +
             "FROM\n" +

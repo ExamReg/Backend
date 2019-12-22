@@ -181,7 +181,10 @@ async function getSemester(req, res){
 
 async function createSemester(req, res){
     try{
-        let {value} = req.body;
+        let {value, register_from, register_to} = req.body;
+        if(!value){
+            throw new Error("Missing tên kỳ học.")
+        }
         let row_semester = await Semester.findOne({
             where: {
                 value: value
@@ -190,7 +193,9 @@ async function createSemester(req, res){
         if(!row_semester){
             row_semester = await Semester.create({
                 value: value,
-                create_time: Date.now()
+                create_time: Date.now(),
+                register_from: register_from,
+                register_to: register_to
             })
         }
         return res.json(response.buildSuccess({}));
@@ -203,7 +208,10 @@ async function createSemester(req, res){
 
 async function updateSemester(req, res){
     try{
-        let {value} = req.body;
+        let {value, register_from, register_to} = req.body;
+        if(!value){
+            throw new Error("Missing tên kỳ học.")
+        }
         let {id_semester} = req.params;
         let row_semester = await Semester.findOne({
             where: {
@@ -212,7 +220,9 @@ async function updateSemester(req, res){
         });
         if(row_semester){
             await Semester.update({
-                value: value
+                value: value,
+                register_to: register_to,
+                register_from: register_from
             },{
                 where: {
                     id_semester: id_semester
