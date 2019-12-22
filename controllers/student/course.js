@@ -4,10 +4,18 @@ const response = require("../../utils/response");
 
 async function getSemestersOfStudent(req, res) {
     try {
-        let sql = "select S.id_semester, S.value from CourseStudent CSt\n" +
-            "\tinner join CourseSemester CSe on CSe.id_cs = CSt.id_cs\n" +
-            "    inner join Semester as S on CSe.id_semester = S.id_semester\n" +
-            "where id_student = :id_student;";
+        let sql = "SELECT\n" +
+            "    S.id_semester, S.value\n" +
+            "FROM\n" +
+            "    CourseStudent CSt\n" +
+            "        INNER JOIN\n" +
+            "    CourseSemester CSe ON CSe.id_cs = CSt.id_cs\n" +
+            "        INNER JOIN\n" +
+            "    Semester AS S ON CSe.id_semester = S.id_semester\n" +
+            "WHERE\n" +
+            "    id_student = :id_student\n" +
+            "group by S.id_semester" +
+            "order by S.create_time DESC";
         let semesters = await db.sequelize.query(sql, {
             replacements: {
                 id_student: req.tokenData.id_student
