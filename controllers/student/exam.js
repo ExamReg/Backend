@@ -50,6 +50,9 @@ async function getExams(req, res){
 async function getExamsRegistered(req, res){
     try{
         let {id_semester} = req.query;
+        if(!id_semester){
+            throw new Error("Vui lòng chọn 1 kỳ học.")
+        }
         let sql = "SELECT \n" +
             "    Slot.*,\n" +
             "    CSe.id_course,\n" +

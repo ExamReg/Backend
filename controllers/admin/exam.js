@@ -185,7 +185,7 @@ async function getExams(req, res) {
             "    S.time_end,\n" +
             "    S.maximum_seating,\n" +
             "    R.location," +
-            "    S.id_slot\n" +
+            "    S.id as id_slot\n" +
             "FROM\n" +
             "    (SELECT \n" +
             "        *\n" +
