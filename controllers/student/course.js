@@ -15,7 +15,7 @@ async function getSemestersOfStudent(req, res) {
             "WHERE\n" +
             "    id_student = :id_student\n" +
             "group by S.id_semester" +
-            "order by S.create_time DESC";
+            " order by S.create_time DESC";
         let semesters = await db.sequelize.query(sql, {
             replacements: {
                 id_student: req.tokenData.id_student
