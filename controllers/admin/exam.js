@@ -78,7 +78,7 @@ async function createExam(req, res) {
 
 async function getExams(req, res) {
     try {
-        let {id_semester, page_size, page_number, text, time_from, time_end} = req.query;
+        let {id_semester, page_size, page_number, text, time_start, time_end} = req.query;
         if (!page_number) {
             page_number = 0
         } else {
@@ -115,7 +115,7 @@ async function getExams(req, res) {
             "    Slot S ON S.id_exam = E.id_exam\n" +
             "        INNER JOIN\n" +
             "    Room R ON R.id_room = S.id_room" +
-                " order by S.time_from ASC";
+                " order by S.time_start ASC";
         let exams = await db.sequelize.query(sql, {
             replacements: {
                 id_semester: id_semester,
