@@ -19,6 +19,7 @@ api.post("/courses", verifyToken("admin"), upload, courseController.createNewCou
 api.get("/courses", verifyToken("admin"), courseController.getCourses);
 api.get("/courses/:id_cs", verifyToken("admin"), courseController.getCourse);
 api.get("/courses/:id_cs/students", verifyToken("admin"), courseController.getStudentsInCourse);
+api.post("/courses/:id_cs/import", verifyToken("admin"), upload, courseController.importStudentNotEnough);
 
 
 api.get("/semesters", verifyToken("admin"), courseController.getSemester);

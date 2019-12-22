@@ -307,6 +307,37 @@ async function getStudentsInCourse(req, res){
     }
 }
 
+async function importStudentNotEnough(req, res){
+    try{
+        let {id_cs} = req.params;
+        if(!req.file){
+            throw new Error('File missing')
+        }
+        let typeFile = req.file.originalname.split(".")[req.file.originalname.split(".").length - 1];
+        if( typeFile !== "xlsx" && typeFile !== "csv"){
+            throw new Error("Định dạng file không hợp lệ.")
+        }
+        let jsonData = await convertExcelToJson(req.file);
+        for(let e of jsonData){
+            if(e.mssv){
+                await CourseStudent.update({
+                    is_eligible: false
+                },{
+                    where: {
+                        id_student: e.mssv,
+                        id_cs: id_cs
+                    }
+                })
+            }
+        }
+        return res.json(response.buildSuccess({}))
+    }
+    catch(err){
+        console.log("importStudentNotEnough: ", err.message);
+        return res.json(response.buildFail(err.message))
+    }
+}
+
 module.exports = {
     createNewCourse,
     getCourses,
@@ -314,5 +345,6 @@ module.exports = {
     createSemester,
     updateSemester,
     getCourse,
-    getStudentsInCourse
+    getStudentsInCourse,
+    importStudentNotEnough
 };
