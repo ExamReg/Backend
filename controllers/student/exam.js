@@ -81,7 +81,8 @@ async function getExamsRegistered(req, res){
             "    S.time_start,\n" +
             "    S.time_end,\n" +
             "    S.id AS id_slot,\n" +
-            "    R.location\n" +
+            "    R.location," +
+            "    E.id_cs\n" +
             "FROM\n" +
             "    (SELECT \n" +
             "        *\n" +
