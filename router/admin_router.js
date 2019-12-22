@@ -37,6 +37,8 @@ api.put("/students/:id_student/passwords", verifyToken("admin"), studentControll
 
 api.post("/exams", verifyToken("admin"), examController.createExam);
 api.get("/exams", verifyToken("admin"), examController.getExams);
+api.put("/exams/:id_slot", verifyToken("admin"), examController.updateExam);
+api.delete("/exams/id_slot", verifyToken("admin"), examController.deleteExams);
 
 
 module.exports = api;

@@ -76,6 +76,95 @@ async function createExam(req, res) {
     }
 }
 
+async function updateExam(req, res) {
+    let {time_start, time_end, id_room, maximum_seating} = req.body;
+    let {id_slot} = req.params;
+    try {
+        //Check xem ca này đã đăng kí chưa. nếu chưa thì cho sửa.
+        if (!time_start || !time_end || !id_room || !maximum_seating) {
+            throw new Error("Something missing.")
+        }
+        if(time_end <= time_start){
+            throw new Error("Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc");
+        }
+        let room = await Room.findOne({
+            where: {
+                id_room: id_room
+            }
+        });
+        if (!room) {
+            throw new Error("Phòng bạn chọn không tồn tại.")
+        }
+        if (room.dataValues.maximum_seating < maximum_seating) {
+            throw new Error(`Phòng này không đủ chỗ cho ${maximum_seating} sinh viên.`)
+        }
+        // check phòng còn trống hay không
+        let slot = await Slot.findOne({
+            where: {
+                [db.Sequelize.Op.or]: [
+                    {
+                        time_end: {
+                            [db.Sequelize.Op.between]: {time_start, time_end}
+                        }
+                    },
+                    {
+                        time_start: {
+                            [db.Sequelize.Op.between]: {time_start, time_end}
+                        }
+                    },
+                    {
+                        time_start: {
+                            [db.Sequelize.Op.lte]: time_start
+                        },
+                        time_end: {
+                            [db.Sequelize.Op.gte]: time_end
+                        }
+                    }
+                ]
+            }
+        });
+        if (slot) {
+            throw new Error("Lịch thi bị trùng. Vui lòng chọn lại.")
+        }else{
+            slot = await Slot.findOne({
+                where: {
+                    id_slot: id_slot
+                }
+            });
+            if(!slot){
+                throw new Error("Ca thi không tồn tại.")
+            }
+            await Slot.update({
+                time_start: time_start,
+                time_end: time_end,
+                id_room: id_room,
+                maximum_seating: maximum_seating
+            });
+        }
+        return res.json(response.buildSuccess({}))
+    } catch (err) {
+        console.log("createExam", err.message);
+        return res.json(response.buildFail(err.message))
+    }
+}
+
+async function deleteExams(req, res){
+    try{
+        let {id_slot} = req.params;
+        //check xem slot đã được đăng ký hay chưa ? Nếu chưa thì mới xoá.
+        await Slot.destroy({
+            where: {
+                id_slot: id_slot
+            }
+        });
+        return res.json(response.buildSuccess({}))
+    }
+    catch(err){
+        console.log("deleteExam: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 async function getExams(req, res) {
     try {
         let {id_semester, page_size, page_number, text, time_start, time_end} = req.query;
@@ -142,5 +231,7 @@ async function getExams(req, res) {
 
 module.exports = {
     createExam,
-    getExams
+    getExams,
+    updateExam,
+    deleteExams
 };
