@@ -23,7 +23,7 @@ module.exports = (sequelize, Sequelize) => {
         });
         Slot.belongsToMany(models.Student, {
             foreignKey: "id_slot",
-            as: "slot",
+            as: "student_register",
             through: models.StudentSlot
         })
     };

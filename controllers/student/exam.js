@@ -173,7 +173,7 @@ async function examRegister(req, res){
         if(!semester){
             throw new Error("Kì học bạn chọn không tồn tại.")
         }else{
-            if(semester.dataValues.register_from > parseInt(Date.now() / 1000) ||  semester.dataValues.register_to < parseInt(Date.now() / 1000)){
+            if(semester.dataValues.register_from > parseInt(Date.now()) ||  semester.dataValues.register_to < parseInt(Date.now())){
                 throw new Error("Ngoài thời gian đăng kí");
             }
         }
@@ -211,7 +211,47 @@ async function examRegister(req, res){
                 listSlotWillDelete.push(e);
             }
         }
-        let transaction = await db.sequelize.transaction();
+        let transaction;
+        try{
+            transaction = await db.sequelize.transaction();
+            let slot_ids = listSlotWillDelete.map(e => e.id_slot);
+            await db.StudentSlot.destroy({
+                where: {
+                    id_student: req.tokenData.id_student,
+                    id_slot: {
+                        [db.Sequelize.Op.in]: slot_ids
+                    }
+                },
+                transaction
+            });
+            for(let e of listSlotWillCreate){
+                let informationSlot = await db.Slot.findAndCountAll({
+                    where: {
+                        id: e.id_slot
+                    },
+                    include: {
+                        model: db.Student,
+                        as: "student_register"
+                    }
+                });
+                let seated = informationSlot.count;
+                let maximum_seating = informationSlot.rows[0].dataValues.maximum_seating;
+                if(seated < maximum_seating){
+                    await db.StudentSlot.create({
+                        id_slot: e.id_slot,
+                        id_student: req.tokenData.id_student
+                    },{transaction})
+                }else{
+                    throw new Error("Ca thi nào đó đã hết chỗ.")
+                }
+            }
+            await transaction.commit();
+        }
+        catch (e) {
+            if (transaction) await transaction.rollback();
+            throw new Error(e.message)
+        }
+        return res.json(response.buildSuccess({}));
     }
     catch(err){
         console.log("examRegister: ", err.message);

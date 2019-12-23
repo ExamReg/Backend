@@ -31,7 +31,8 @@ module.exports = (sequelize, Sequelize) => {
         });
         Student.belongsToMany(models.Slot, {
            foreignKey: "id_student",
-           through: models.StudentSlot
+           through: models.StudentSlot,
+            as: "student_register"
         })
     };
 
