@@ -243,7 +243,8 @@ async function examRegister(req, res){
                     replacements: {
                         id_slot: e.id_slot,
                         id_student: req.tokenData.id_student
-                    }
+                    },
+                    type: db.Sequelize.QueryTypes.SELECT
                 });
                 if(cs.length < 0 || !cs[0].is_eligible){
                     throw new Error("Trong danh sách có môn mà bạn không đủ điều kiện đăng kí thi.")
