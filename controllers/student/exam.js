@@ -234,6 +234,20 @@ async function examRegister(req, res){
                         as: "student_register"
                     }
                 });
+                let sql = "select CSt.is_eligible from CourseSemester CSe\n" +
+                    "\tinner join CourseStudent CSt on CSt.id_cs = CSe.id_cs\n" +
+                    "    inner join Exam E on E.id_cs = CSe.id_cs\n" +
+                    "    inner join Slot S on S.id_exam = E.id_exam\n" +
+                    "where id_student = :id_student and S.id = :id_slot";
+                let cs = await db.sequelize.query(sql, {
+                    replacements: {
+                        id_slot: e.id_slot,
+                        id_student: req.tokenData.id_student
+                    }
+                });
+                if(cs.length < 0 || !cs[0].is_eligible){
+                    throw new Error("Trong danh sách có môn mà bạn không đủ điều kiện đăng kí thi.")
+                }
                 let seated = informationSlot.count;
                 let maximum_seating = informationSlot.rows[0].dataValues.maximum_seating;
                 if(seated < maximum_seating){
