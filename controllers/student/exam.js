@@ -3,10 +3,21 @@ const response = require("../../utils/response");
 
 async function getExams(req, res){
     let {id_semester} = req.query;
-    //check co trong time dang ky hay k
     try{
         if(!id_semester){
             throw new Error("Vui lòng chọn một kỳ học.")
+        }
+        let semester = await db.Semester.findOne({
+            where: {
+                id_semester: id_semester
+            }
+        });
+        if(!semester){
+            throw new Error("Kì học bạn chọn không tồn tại.")
+        }else{
+            if(semester.dataValues.register_from > parseInt(Date.now() / 1000) ||  semester.dataValues.register_to < parseInt(Date.now() / 1000)){
+                return res.json(response.buildSuccess({exams: []}));
+            }
         }
         let sql = "SELECT \n" +
             "    S.time_start,\n" +
@@ -75,6 +86,14 @@ async function getExamsRegistered(req, res){
         if(!id_semester){
             throw new Error("Vui lòng chọn 1 kỳ học.")
         }
+        let semester = await db.Semester.findOne({
+            where: {
+                id_semester: id_semester
+            }
+        });
+        if(!semester){
+            throw new Error("Kì học bạn chọn không tồn tại.")
+        }
         let sql = "SELECT \n" +
             "    C.course_name,\n" +
             "    C.id_course,\n" +
@@ -121,9 +140,28 @@ async function getExamsRegistered(req, res){
     }
 }
 
+async function getNewestSemesters(req, res){
+    try{
+        let semester = await db.Semester.findAll({
+            order: [
+                ["create_time", "DESC"]
+            ],
+            limit: 1,
+        });
+        let data = {};
+        data.semester = semester.length > 0 ? semester[0] : {};
+        return res.json(response.buildSuccess(data));
+    }
+    catch(err){
+        console.log("getNewestSemesters: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 module.exports = {
     getExams,
-    getExamsRegistered
+    getExamsRegistered,
+    getNewestSemesters
 };
 
 

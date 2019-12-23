@@ -10,6 +10,7 @@ api.get("/profile", verifyToken("student"), userController.getProfileStudent);
 
 api.put("/users/password", verifyToken("student"), userController.changePassword);
 
+api.get("/semesters/newest", verifyToken("student"), examController.getNewestSemesters);
 
 api.get("/semesters", verifyToken("student"), courseController.getSemestersOfStudent);
 api.get("/courses", verifyToken("student"), courseController.getCoursesOfStudent);
