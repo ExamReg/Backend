@@ -4,9 +4,6 @@ const config = require("config");
 
 const verifyToken = role => {
     return (req, res, next) => {
-        if(!req.headers['token']){
-            throw new Error("Token missing");
-        }
         let secretKey = "";
         if(role === "admin"){
             secretKey = config.get("secret_key_admin");
@@ -14,6 +11,9 @@ const verifyToken = role => {
             secretKey = config.get("secret_key_student");
         }
         try{
+            if(!req.headers['token']){
+                throw new Error("Token missing");
+            }
             let token = req.headers["token"];
             jwt.verify(token, secretKey, (err, decode) => {
                 if(err){
