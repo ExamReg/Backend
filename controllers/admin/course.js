@@ -313,6 +313,16 @@ async function importStudentNotEnough(req, res){
         if(!req.file){
             throw new Error('File missing')
         }
+        let time = Date.now();
+        let semseter = await db.Semester.findAll({
+            order: [
+                ['create_time', 'DESC']
+            ],
+            limit: 1
+        });
+        if(parseInt(semseter[0].dataValues.register_from) <= time && parseInt(semseter[0].dataValues.register_to) > time){
+            throw new Error("Đang trong thời gian đăng kí thi. Vui lòng thử lại sau.")
+        }
         let typeFile = req.file.originalname.split(".")[req.file.originalname.split(".").length - 1];
         if( typeFile !== "xlsx" && typeFile !== "csv"){
             throw new Error("Định dạng file không hợp lệ.")

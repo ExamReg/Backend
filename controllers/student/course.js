@@ -71,6 +71,9 @@ async function printExamRegisteredInSemester(req, res){
             throw new Error("Kì học bạn chọn không tồn tại.")
         }
         let exams = await getExamRegistered(id_semester, req.tokenData.id_student);
+        if(exams.length <= 0 ){
+            throw new Error("Bạn chưa đăng kí thi môn nào trong kì bạn đã chọn.")
+        }
         let student = await db.Student.findOne({
             where: {
                 id_student: req.tokenData.id_student

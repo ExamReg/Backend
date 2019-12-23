@@ -171,6 +171,18 @@ async function changeStatusStudentInCourseSemester(req, res){
         if(!id_cs || !id_student || is_eligible === ""){
             throw new Error("Something missing.")
         }
+        if(!is_eligible){
+            let time = Date.now();
+            let semseter = await db.Semester.findAll({
+                order: [
+                    ['create_time', 'DESC']
+                ],
+                limit: 1
+            });
+            if(parseInt(semseter[0].dataValues.register_from) <= time && parseInt(semseter[0].dataValues.register_to) > time){
+                throw new Error("Đang trong thời gian đăng kí thi. Vui lòng thử lại sau.")
+            }
+        }
         let student = await db.CourseStudent.findOne({
             where: {
                 id_cs: id_cs,
@@ -201,6 +213,16 @@ async function removeStudentFromCourse(req, res){
         let {id_cs, id_student} = req.params;
         if(!id_student || !id_cs){
             throw new Error("Something missing.")
+        }
+        let time = Date.now();
+        let semseter = await db.Semester.findAll({
+            order: [
+                ['create_time', 'DESC']
+            ],
+            limit: 1
+        });
+        if(parseInt(semseter[0].dataValues.register_from) <= time && parseInt(semseter[0].dataValues.register_to) > time){
+            throw new Error("Đang trong thời gian đăng kí thi. Vui lòng thử lại sau.")
         }
         let student = await db.CourseStudent.findOne({
             where: {

@@ -82,11 +82,10 @@ async function updateExam(req, res) {
     let {time_start, time_end, id_room, maximum_seating} = req.body;
     let {id_slot} = req.params;
     try {
-        //Check xem ca này đã đăng kí chưa. nếu chưa thì cho sửa.
         if (!time_start || !time_end || !id_room || !maximum_seating) {
             throw new Error("Something missing.")
         }
-        if(time_end <= time_start){
+        if(time_end < time_start){
             throw new Error("Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc");
         }
         let room = await Room.findOne({
@@ -100,7 +99,16 @@ async function updateExam(req, res) {
         if (room.dataValues.maximum_seating < maximum_seating) {
             throw new Error(`Phòng này không đủ chỗ cho ${maximum_seating} sinh viên.`)
         }
-        // check phòng còn trống hay không
+        let time = Date.now();
+        let semseter = await db.Semester.findAll({
+            order: [
+                ['create_time', 'DESC']
+            ],
+            limit: 1
+        });
+        if(parseInt(semseter[0].dataValues.register_from) <= time && parseInt(semseter[0].dataValues.register_to) > time){
+            throw new Error("Đang trong thời gian đăng kí thi. Vui lòng thử lại sau.")
+        }
         let slot = await Slot.findOne({
             where: {
                 id: {
@@ -253,6 +261,9 @@ async function printStudentInExam(req, res){
             },
             type: db.Sequelize.QueryTypes.SELECT
         });
+        if(students.length <= 0){
+            throw new Error("Chưa có sinh viên nào đăng kí thi ở ca này.")
+        }
         sql = "select C.*, S.time_start, S.time_end, S.maximum_seating, R.location, Se.value from Slot S\n" +
             "\tinner join Exam E on E.id_exam = S.id_exam\n" +
             "    inner join CourseSemester CSe on CSe.id_cs = E.id_cs\n" +
