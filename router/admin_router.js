@@ -35,7 +35,7 @@ api.get("/students", verifyToken("admin"), studentController.getStudents);
 api.put("/students/:id_student", verifyToken("admin"), studentController.updateStudent);
 api.put("/courses/:id_cs/students/:id_student/status", verifyToken("admin"), studentController.changeStatusStudentInCourseSemester);
 api.delete("/courses/:id_cs/students/:id_student", verifyToken("admin"), studentController.removeStudentFromCourse);
-
+api.post("/courses/:id_cs/students", verifyToken("admin"), courseController.addStudentToCourse);
 
 api.put("/students/:id_student/passwords", verifyToken("admin"), studentController.resetPassword);
 

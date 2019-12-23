@@ -338,6 +338,41 @@ async function importStudentNotEnough(req, res){
     }
 }
 
+async function addStudentToCourse(req, res){
+    try{
+        let {id_cs} = req.params;
+        let {id_student} = req.body;
+        let student = await db.Student.findOne({
+            where: {
+                id_student: id_student
+            }
+        });
+        if(!student){
+            throw new Error('Sinh viên không tồn tại');
+        }
+        let studentSlot = await db.CourseStudent.findOne({
+            where: {
+                id_student: id_student,
+                id_cs: id_cs
+            }
+        });
+        if(studentSlot){
+            throw new Error("Sinh viên đã có trong môn học.")
+        }
+        await db.CourseStudent.create({
+            id_cs: id_cs,
+            id_student: id_student,
+            is_eligible: true,
+
+        });
+        return res.json(response.buildSuccess({}));
+    }
+    catch(err){
+        console.log("addStudentToCourse: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 module.exports = {
     createNewCourse,
     getCourses,
@@ -346,5 +381,6 @@ module.exports = {
     updateSemester,
     getCourse,
     getStudentsInCourse,
-    importStudentNotEnough
+    importStudentNotEnough,
+    addStudentToCourse
 };
