@@ -209,7 +209,7 @@ function createFileStudentInExam(data) {
             <p style =" font-weight: bold">XÁC NHẬN CỦA PHÒNG ĐÀO TẠO  </p>
         </div>
     </div>
-    <button class="btn-print">In lịch thi </button>
+    <button class="btn-print" onclick=window.print()>In lịch thi </button>
 </div>
 </body>
 </html>`)

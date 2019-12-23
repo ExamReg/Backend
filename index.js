@@ -12,7 +12,7 @@ app.use(cors());
 app.use(morgan('tiny'));
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({extended: false}));
-
+app.use('/static', express.static('./uploads'));
 app.use("/ping", (req, res) => {
     res.send("pong")
 });
