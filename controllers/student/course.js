@@ -1,6 +1,8 @@
 const db = require("../../models/index");
 const response = require("../../utils/response");
-
+const {getExamRegistered} = require("../../utils/query/exam");
+const createFile = require("../../utils/createFileExamRegistered");
+const fs = require("fs");
 
 async function getSemestersOfStudent(req, res) {
     try {
@@ -54,7 +56,42 @@ async function getCoursesOfStudent(req, res) {
     }
 }
 
+async function printExamRegisteredInSemester(req, res){
+    try{
+        let {id_semester} = req.query;
+        if(!id_semester){
+            throw new Error("Vui lòng chọn 1 kỳ học.")
+        }
+        let semester = await db.Semester.findOne({
+            where: {
+                id_semester: id_semester
+            }
+        });
+        if(!semester){
+            throw new Error("Kì học bạn chọn không tồn tại.")
+        }
+        let exams = await getExamRegistered(id_semester, req.tokenData.id_student);
+        let student = await db.Student.findOne({
+            where: {
+                id_student: req.tokenData.id_student
+            }
+        });
+        let html = createFile({student: student.dataValues, exams});
+        html = html.trim();
+        html = html.replace(/(\r\n|\n|\r)/gm,"");
+        html = html.replace(/(\\)/gm, '');
+        let file_name = Date.now() + ".html";
+        fs.writeFileSync("./uploads/" + file_name, html);
+        return res.json(response.buildSuccess({file_name: file_name}));
+    }
+    catch(err){
+        console.log("printExamRegistedInSemester: ", err.message);
+        return res.json(response.buildFail(err.message))
+    }
+}
+
 module.exports = {
     getSemestersOfStudent,
-    getCoursesOfStudent
+    getCoursesOfStudent,
+    printExamRegisteredInSemester
 };

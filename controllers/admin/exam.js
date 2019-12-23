@@ -3,6 +3,8 @@ const Slot = db.Slot;
 const Room = db.Room;
 const Exam = db.Exam;
 const response = require("../../utils/response");
+const createFile = require("../../utils/createFileStudentInExam");
+const fs = require("fs");
 
 async function createExam(req, res) {
     let {time_start, time_end, id_cs, id_room, maximum_seating} = req.body;
@@ -238,9 +240,50 @@ async function getExams(req, res) {
     }
 }
 
+async function printStudentInExam(req, res){
+    try{
+        let {id_slot} = req.query;
+        let sql = "select St.* from Slot S \n" +
+            "\tinner join StudentSlot SS on S.id = SS.id_slot\n" +
+            "    inner join Student St on St.id_student = SS.id_student\n" +
+            "where S.id = :id_slot";
+        let students = await db.sequelize.query(sql, {
+            replacements: {
+                id_slot: id_slot
+            },
+            type: db.Sequelize.QueryTypes.SELECT
+        });
+        sql = "select C.*, S.time_start, S.time_end, S.maximum_seating, R.location, Se.value from Slot S\n" +
+            "\tinner join Exam E on E.id_exam = S.id_exam\n" +
+            "    inner join CourseSemester CSe on CSe.id_cs = E.id_cs\n" +
+            "    inner join Course C on C.id_course = CSe.id_course\n" +
+            "    inner join Room R on R.id_room = S.id_room\n" +
+            "    inner join Semester Se on Se.id_semester = CSe.id_semester\n" +
+            "where S.id=:id_slot";
+        let result = await db.sequelize.query(sql, {
+            replacements: {
+                id_slot: id_slot
+            },
+            type: db.Sequelize.QueryTypes.SELECT
+        });
+        let html = createFile({students, result: result[0]});
+        html = html.trim();
+        html = html.replace(/(\r\n|\n|\r)/gm,"");
+        html = html.replace(/(\\)/gm, '');
+        let file_name = Date.now() + ".html";
+        fs.writeFileSync("./uploads/" + file_name, html);
+        return res.json(response.buildSuccess({file_name: file_name}));
+    }
+    catch(err){
+        console.log("printStudentInExam: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 module.exports = {
     createExam,
     getExams,
     updateExam,
-    deleteExams
+    deleteExams,
+    printStudentInExam
 };

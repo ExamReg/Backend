@@ -43,6 +43,7 @@ api.post("/exams", verifyToken("admin"), examController.createExam);
 api.get("/exams", verifyToken("admin"), examController.getExams);
 api.put("/exams/:id_slot", verifyToken("admin"), examController.updateExam);
 api.delete("/exams/id_slot", verifyToken("admin"), examController.deleteExams);
+api.get("/exams/students/print", verifyToken("admin"), examController.printStudentInExam);
 
 
 module.exports = api;
