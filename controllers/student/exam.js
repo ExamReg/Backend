@@ -15,7 +15,7 @@ async function getExams(req, res){
         if(!semester){
             throw new Error("Kì học bạn chọn không tồn tại.")
         }else{
-            if(semester.dataValues.register_from > parseInt(Date.now() / 1000) ||  semester.dataValues.register_to < parseInt(Date.now() / 1000)){
+            if(semester.dataValues.register_from > parseInt(Date.now()) ||  semester.dataValues.register_to < parseInt(Date.now())){
                 return res.json(response.buildSuccess({exams: []}));
             }
         }
@@ -158,10 +158,72 @@ async function getNewestSemesters(req, res){
     }
 }
 
+async function examRegister(req, res){
+    let {id_semester} = req.query;
+    let {slots} = req.body;
+    try{
+        if(!id_semester){
+            throw new Error("Vui lòng chọn một kỳ học.")
+        }
+        let semester = await db.Semester.findOne({
+            where: {
+                id_semester: id_semester
+            }
+        });
+        if(!semester){
+            throw new Error("Kì học bạn chọn không tồn tại.")
+        }else{
+            if(semester.dataValues.register_from > parseInt(Date.now() / 1000) ||  semester.dataValues.register_to < parseInt(Date.now() / 1000)){
+                throw new Error("Ngoài thời gian đăng kí");
+            }
+        }
+        let sql = "SELECT \n" +
+            "    S.id as id_slot\n" +
+            "FROM\n" +
+            "    CourseSemester AS CSe\n" +
+            "        INNER JOIN\n" +
+            "    Exam E ON E.id_cs = CSe.id_cs\n" +
+            "        INNER JOIN\n" +
+            "    Slot S ON S.id_exam = E.id_exam\n" +
+            "        INNER JOIN\n" +
+            "    StudentSlot SS ON SS.id_slot = S.id\n" +
+            "WHERE\n" +
+            "    CSe.id_semester = :id_semester\n" +
+            "        AND SS.id_student = :id_student";
+        let old_slots = await db.sequelize.query(sql, {
+            replacements: {
+                id_student: req.tokenData.id_student,
+                id_semester: id_semester
+            },
+            type: db.Sequelize.QueryTypes.SELECT
+        });
+        let listSlotWillDelete = [];
+        let listSlotWillCreate = [];
+        for(let e of slots){
+            let index = old_slots.findIndex(ele => parseInt(ele.slot_id) === parseInt(e.id_slot));
+            if(index === -1){
+                listSlotWillCreate.push(e);
+            }
+        }
+        for(let e of old_slots){
+            let index = slots.findIndex(ele => parseInt(ele.slot_id) === parseInt(e.id_slot));
+            if(index === -1){
+                listSlotWillDelete.push(e);
+            }
+        }
+        let transaction = await db.sequelize.transaction();
+    }
+    catch(err){
+        console.log("examRegister: ", err.message);
+        return res.json(response.buildFail(err.message));
+    }
+}
+
 module.exports = {
     getExams,
     getExamsRegistered,
-    getNewestSemesters
+    getNewestSemesters,
+    examRegister
 };
 
 

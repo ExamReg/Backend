@@ -17,5 +17,6 @@ api.get("/courses", verifyToken("student"), courseController.getCoursesOfStudent
 
 api.get("/exams", verifyToken("student"), examController.getExams);
 api.get("/exams/registered", verifyToken("student"), examController.getExamsRegistered);
+api.put("/exams", verifyToken("student"), examController.examRegister);
 
 module.exports = api;
