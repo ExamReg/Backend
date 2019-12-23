@@ -146,8 +146,9 @@ async function getNewestSemesters(req, res){
             order: [
                 ["create_time", "DESC"]
             ],
-            limit: 1,
+            limit: 1
         });
+        console.log(semester);
         let data = {};
         data.semester = semester.length > 0 ? semester[0] : {};
         return res.json(response.buildSuccess(data));
@@ -197,20 +198,24 @@ async function examRegister(req, res){
             },
             type: db.Sequelize.QueryTypes.SELECT
         });
+        console.log("old",old_slots);
+        console.log("send",slots);
         let listSlotWillDelete = [];
         let listSlotWillCreate = [];
         for(let e of slots){
-            let index = old_slots.findIndex(ele => parseInt(ele.slot_id) === parseInt(e.id_slot));
+            let index = old_slots.findIndex(ele => parseInt(ele.id_slot) === parseInt(e.id_slot));
             if(index === -1){
                 listSlotWillCreate.push(e);
             }
         }
         for(let e of old_slots){
-            let index = slots.findIndex(ele => parseInt(ele.slot_id) === parseInt(e.id_slot));
+            let index = slots.findIndex(ele => parseInt(ele.id_slot) === parseInt(e.id_slot));
             if(index === -1){
                 listSlotWillDelete.push(e);
             }
         }
+        console.log("create: ",listSlotWillCreate);
+        console.log("delete: ", listSlotWillDelete);
         let transaction;
         try{
             transaction = await db.sequelize.transaction();
@@ -246,8 +251,50 @@ async function examRegister(req, res){
                     },
                     type: db.Sequelize.QueryTypes.SELECT
                 });
-                if(cs.length < 0 || !cs[0].is_eligible){
+                if(!cs[0].is_eligible){
                     throw new Error("Trong danh sách có môn mà bạn không đủ điều kiện đăng kí thi.")
+                }
+                if(cs.length < 0){
+                    throw new Error("Trong danh sách đăng kí của bạn có ca thi đã hết chỗ.")
+                }
+                sql = "SELECT \n" +
+                    "    S.time_start, S.time_end, S.id, S.id_room AS id_slot\n" +
+                    "FROM\n" +
+                    "    (SELECT \n" +
+                    "        *\n" +
+                    "    FROM\n" +
+                    "        StudentSlot\n" +
+                    "    WHERE\n" +
+                    "        id_student = :id_student) SS\n" +
+                    "        INNER JOIN\n" +
+                    "    Slot AS S ON S.id = SS.id_slot\n" +
+                    "        INNER JOIN\n" +
+                    "    Exam E ON E.id_exam = S.id_exam\n" +
+                    "        INNER JOIN\n" +
+                    "    (SELECT \n" +
+                    "        *\n" +
+                    "    FROM\n" +
+                    "        CourseSemester\n" +
+                    "    WHERE\n" +
+                    "        id_semester = :id_semester) CS ON CS.id_cs = E.id_cs";
+                let slotRegistered = await db.sequelize.query(sql, {
+                    replacements: {
+                        id_student: req.tokenData.id_student,
+                        id_semester: id_semester
+                    }
+                });
+                let checkDuplice = false;
+                let slotWillRegister = informationSlot.rows[0].dataValues;
+                for(let element of slotRegistered){
+                    if(element.id_room === slotWillRegister.id_room && ((element.time_start >= slotWillRegister.time_start && element.time_end <= slotWillRegister.time_start)
+                        || (element.time_start >= slotWillRegister.time_end && element.time_end <= slotWillRegister.time_end)
+                        || (element.time_start >= slotWillRegister.time_end && element.time_end >= slotWillRegister.time_end))){
+                        checkDuplice = true;
+                        break;
+                    }
+                }
+                if(checkDuplice){
+                    throw new Error("Trùng thời gian")
                 }
                 let seated = informationSlot.count;
                 let maximum_seating = informationSlot.rows[0].dataValues.maximum_seating;

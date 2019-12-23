@@ -104,6 +104,7 @@ async function updateExam(req, res) {
                 id: {
                     [db.Sequelize.Op.ne]: id_slot
                 },
+                id_room: id_room,
                 [db.Sequelize.Op.or]: [
                     {
                         time_end: {
